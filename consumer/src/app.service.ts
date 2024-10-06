@@ -6,7 +6,7 @@ export class AppService {
   handleOrderPlaced(order: OrderDto) {
     console.log(`Received: ${JSON.stringify(order)}`);
     return {
-      message: 'Order placed successfully',
+      message: 'Order placed successfully!',
       orderData: order,
     };
   }
