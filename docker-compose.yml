@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"  # RabbitMQ port
+      - "15672:15672" # RabbitMQ management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+    container_name: rabbitmq
+    hostname: rabbitmq
+    networks:
+      - my-network
+
+  producer:
+    build:
+      context: ./producer
+      dockerfile: Dockerfile
+    environment:
+      - RABBITMQ_URL=amqp://user:password@rabbitmq:5672
+    depends_on:
+      - rabbitmq
+    ports:
+      - "3001:3001"  # Expose producer service on port 3001
+    networks:
+      - my-network
+
+  consumer:
+    build:
+      context: ./consumer
+      dockerfile: Dockerfile
+    environment:
+      - RABBITMQ_URL=amqp://user:password@rabbitmq:5672
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    ports:
+      - "3002:3002"  # Expose consumer service on port 3002
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge
