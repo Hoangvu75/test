@@ -20,6 +20,20 @@ services:
     networks:
       - my-network
 
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 8080:8080
+    environment:
+      - server.port=8080
+      - eureka.client.service-url.defaultZone=http://netflixeureka:8761/eureka
+      - spring.application.name=gateway
+    networks:
+      - my-network
+
   producer:
     build:
       context: ./producer

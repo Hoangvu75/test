@@ -8,6 +8,8 @@ x-common: &common
   depends_on:
     - rabbitmq
   command: yarn start:dev
+  restart: always
+
 
 services:
   rabbitmq:
@@ -18,6 +20,20 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: user
       RABBITMQ_DEFAULT_PASS: password
+    networks:
+      - my-network
+
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 8080:8080
+    environment:
+      - server.port=8080
+      - eureka.client.service-url.defaultZone=http://netflixeureka:8761/eureka
+      - spring.application.name=gateway
     networks:
       - my-network
 
@@ -42,7 +58,7 @@ services:
       - /app/node_modues
       - ./consumer/src:/app/src
     <<: *common
-    
+
 networks:
   my-network:
     driver: bridge
